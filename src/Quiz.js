@@ -1,23 +1,23 @@
 import React from 'react';
-import Book from './Book';
+import Answer from './Answer';
 import './App.css';
 import './bootstrap.min.css';
 
 const Quiz = props => {
-  const highlightToBackgroundColor = highlight => {
+  const answerToBackgroundColor = answer => {
     const mapping = {
       none: '',
       correct: 'green',
       wrong: 'red'
     };
 
-    return mapping[highlight];
+    return mapping[answer];
   };
 
   return (
     <div
       className='row turn'
-      style={{ backgroundColor: highlightToBackgroundColor(props.highlight) }}
+      style={{ backgroundColor: answerToBackgroundColor(props.answer) }}
     >
       <div className='col-4 offset-1'>
         <img
@@ -27,8 +27,8 @@ const Quiz = props => {
         />
       </div>
       <div className='col-6'>
-        {props.quizData.books.map(title => (
-          <Book key={title} title={title} onClick={props.onAnswerSelected} />
+        {props.quizData.answers.map(title => (
+          <Answer key={title} title={title} onAnswer={props.onAnswer} />
         ))}
       </div>
     </div>

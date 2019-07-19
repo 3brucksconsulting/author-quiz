@@ -54,39 +54,42 @@ const getQuizData = authors => {
   const allBooks = authors.reduce((p, c, i) => {
     return p.concat(c.books);
   }, []);
-  const fourRandomBooks = shuffle(allBooks).slice(0, 4);
-  const answer = sample(fourRandomBooks);
+  const availableBooks = shuffle(allBooks).slice(0, 4);
+  const selectedBook = sample(availableBooks);
 
   return {
-    books: fourRandomBooks,
     author: authors.find(author =>
-      author.books.some(title => title === answer)
+      author.books.some(book => book === selectedBook)
     ),
-    highlight: 'correct'
+    answers: availableBooks,
+    answer: selectedBook
   };
 };
 
-const state = {
-  quizData: getQuizData(authors)
-};
+class Root extends React.Component {
+  constructor() {
+    super();
 
-const render = () => {
-  const evaluateAnswer = props => {
-    const isCorrect = state.quizData.author.books.some(
-      book => book === props.answer
+    this.state = {
+      quizData: getQuizData(authors),
+      answer: 'none'
+    };
+  }
+
+  evaluateAnswer = (answer) => {
+    const isAnswer = this.state.quizData.author.books.some(
+      book => book === answer
     );
-    state.highlight = isCorrect ? 'correct' : 'wrong';
 
-    render();
+    this.setState({ answer: isAnswer ? 'correct' : 'wrong' });
   };
 
-  ReactDOM.render(
-    <AuthorQuiz {...state} onAnswerSelected={evaluateAnswer} />,
-    document.getElementById('root')
-  );
-};
+  render() {
+    return <AuthorQuiz {...this.state} onAnswer={this.evaluateAnswer} />;
+  }
+}
 
-render();
+ReactDOM.render(<Root />, document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
