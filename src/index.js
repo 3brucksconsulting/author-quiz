@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
 import AuthorQuiz from './AuthorQuiz';
+import './index.css';
 import * as serviceWorker from './serviceWorker';
 import { shuffle, sample } from 'underscore';
 
@@ -18,7 +18,7 @@ const authors = [
   },
   {
     name: 'Joseph Conrad',
-    imageUrl: 'images/authors/josephconrad.jpg',
+    imageUrl: 'images/authors/josephconrad.png',
     imageSource: 'Wikimedia Commons',
     books: ['Heart of Darkness']
   },
@@ -50,26 +50,43 @@ const authors = [
   }
 ];
 
-function getTurnData(authors) {
-  const allBooks = authors.reduce(function(p, c, i) {
+const getQuizData = authors => {
+  const allBooks = authors.reduce((p, c, i) => {
     return p.concat(c.books);
   }, []);
-
   const fourRandomBooks = shuffle(allBooks).slice(0, 4);
-
   const answer = sample(fourRandomBooks);
 
   return {
     books: fourRandomBooks,
-    author: authors.find(author => author.books.some(title => title === answer))
+    author: authors.find(author =>
+      author.books.some(title => title === answer)
+    ),
+    highlight: 'correct'
   };
-}
-
-const props = {
-  turnData: getTurnData(authors)
 };
 
-ReactDOM.render(<AuthorQuiz {...props} />, document.getElementById('root'));
+const state = {
+  quizData: getQuizData(authors)
+};
+
+const render = () => {
+  const evaluateAnswer = props => {
+    const isCorrect = state.quizData.author.books.some(
+      book => book === props.answer
+    );
+    state.highlight = isCorrect ? 'correct' : 'wrong';
+
+    render();
+  };
+
+  ReactDOM.render(
+    <AuthorQuiz {...state} onAnswerSelected={evaluateAnswer} />,
+    document.getElementById('root')
+  );
+};
+
+render();
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
