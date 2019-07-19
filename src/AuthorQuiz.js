@@ -28,11 +28,21 @@ const Turn = props => {
   return (
     <div className='row turn' style={{ backgroundColor: 'white' }}>
       <div className='col-4 offset-1'>
-        <img className='authorimage' src={props.author.imageUrl} alt='Author' />
+        <img src={props.author.imageUrl} className='authorimage' alt='Author' />
       </div>
       <div className='col-6'>
-        {props.books.map((title) => <p key={title}>{title}</p>)}
-        </div>
+        {props.books.map(title => (
+          <Book key={title} title={title} />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const Book = props => {
+  return (
+    <div className='answer'>
+      <h4>{props.title}</h4>
     </div>
   );
 };
