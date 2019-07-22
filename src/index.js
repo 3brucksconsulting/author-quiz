@@ -1,6 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { BrowserRouter, Route, withRouter } from 'react-router-dom';
 import AuthorQuiz from './AuthorQuiz';
+import AddAuthor from './AddAuthor';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
 import { shuffle, sample } from 'underscore';
@@ -66,17 +68,19 @@ const getQuizData = authors => {
   };
 };
 
-class Root extends React.Component {
+const initialState = {
+  quizData: getQuizData(authors),
+  answer: 'none'
+};
+
+class App extends React.Component {
   constructor() {
     super();
 
-    this.state = {
-      quizData: getQuizData(authors),
-      answer: 'none'
-    };
+    this.state = initialState;
   }
 
-  evaluateAnswer = (answer) => {
+  evaluateAnswer = answer => {
     const isAnswer = this.state.quizData.author.books.some(
       book => book === answer
     );
@@ -84,12 +88,42 @@ class Root extends React.Component {
     this.setState({ answer: isAnswer ? 'correct' : 'wrong' });
   };
 
+  resetState = () => {
+    this.setState(initialState);
+    // this.render();
+  };
+
   render() {
-    return <AuthorQuiz {...this.state} onAnswer={this.evaluateAnswer} />;
+    return (
+      <AuthorQuiz
+        {...this.state}
+        onAnswer={this.evaluateAnswer}
+        onContinue={this.resetState}
+      />
+    );
   }
 }
 
-ReactDOM.render(<Root />, document.getElementById('root'));
+const AddAuthorWrapper = withRouter(({ history }) => {
+  return (
+    <AddAuthor
+      onAddAuthor={author => {
+        authors.push(author);
+        history.push('/');
+      }}
+    />
+  );
+});
+
+ReactDOM.render(
+  <BrowserRouter>
+    <React.Fragment>
+      <Route exact path='/' component={App} />
+      <Route path='/add' component={AddAuthorWrapper} />
+    </React.Fragment>
+  </BrowserRouter>,
+  document.getElementById('root')
+);
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
